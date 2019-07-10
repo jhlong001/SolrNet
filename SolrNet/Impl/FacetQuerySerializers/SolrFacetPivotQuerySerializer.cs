@@ -1,5 +1,4 @@
 ﻿using System.Collections.Generic;
-using System.Linq;
 using SolrNet.Utils;
 
 namespace SolrNet.Impl.FacetQuerySerializers {
@@ -13,8 +12,11 @@ namespace SolrNet.Impl.FacetQuerySerializers {
         /// <param name="q"></param>
         /// <returns></returns>
         public override IEnumerable<KeyValuePair<string, string>> Serialize(SolrFacetPivotQuery q) {
-            foreach (var pivotQ in q.Fields)
-                yield return KV.Create("facet.pivot", string.Join(",", pivotQ.ToArray()));
+            foreach (var pivotQ in q.Fields) {
+                if (string.IsNullOrEmpty(pivotQ))
+                    continue;
+                yield return KV.Create("facet.pivot", pivotQ);
+            }
             if (q.MinCount.HasValue)
                 yield return KV.Create("facet.pivot.mincount", q.MinCount.ToString());
         }
